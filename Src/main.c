@@ -44,16 +44,10 @@
 #include "stdlib.h"
 #include "stdbool.h"
 #include "25q64_lib.h"
-#include "hd44780.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef hadc1;
-
-I2C_HandleTypeDef hi2c1;
-
 SPI_HandleTypeDef hspi1;
-
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
@@ -67,8 +61,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
-static void MX_ADC1_Init(void);
-static void MX_I2C1_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -76,7 +68,6 @@ static void MX_I2C1_Init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-uint32_t adc_measurring;
 /* USER CODE END 0 */
 
 /**
@@ -110,27 +101,23 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
-  MX_ADC1_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-lcdInit();
-//	dataStr.size = 10;
-//	dataStr.data = (uint8_t *) malloc(dataStr.size * sizeof(uint8_t));
-//	uint8_t buff = 100;
-//	for (uint8_t i = 0; i < dataStr.size; i++) {
-//		dataStr.data[i] = buff += 5; // creating some data for writing to our memory
-//	}
-//	dataStr.memory.addr32 = 0x00;
-//	Memory_WriteData(&dataStr);
-//	uint32_t tmpAddr = 0x00;
-//	for (uint8_t i = 0; i < 10; i++) {
-//		resData[i] = Memory_ReadDataBytes(tmpAddr);
-//		tmpAddr++;
-//	}
-//	free(dataStr.data);
-//	dataStr.data = NULL;
-lcdClrScr();
-lcdPuts("Maybe");
+	dataStr.size = 10;
+	dataStr.data = (uint8_t *) malloc(dataStr.size * sizeof(uint8_t));
+	uint8_t buff = 100;
+	for (uint8_t i = 0; i < dataStr.size; i++) {
+		dataStr.data[i] = buff += 5; // creating some data for writing to our memory
+	}
+	dataStr.memory.addr32 = 0x00;
+	Memory_WriteData(&dataStr);
+	uint32_t tmpAddr = 0x00;
+	for (uint8_t i = 0; i < 10; i++) {
+		resData[i] = Memory_ReadDataBytes(tmpAddr);
+		tmpAddr++;
+	}
+	free(dataStr.data);
+	dataStr.data = NULL;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -203,63 +190,6 @@ void SystemClock_Config(void)
 
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
-}
-
-/* ADC1 init function */
-static void MX_ADC1_Init(void)
-{
-
-  ADC_ChannelConfTypeDef sConfig;
-
-    /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
-    */
-  hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
-  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = DISABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
-  hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-  if (HAL_ADC_Init(&hadc1) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
-  sConfig.Channel = ADC_CHANNEL_10;
-  sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-}
-
-/* I2C1 init function */
-static void MX_I2C1_Init(void)
-{
-
-  hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 100000;
-  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
-  hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c1.Init.OwnAddress2 = 0;
-  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
 }
 
 /* SPI1 init function */
